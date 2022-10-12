@@ -33,15 +33,24 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-processResources {
+sourcesJar {
     dependsOn 'metaProperties'
-    from(new File(project.buildDir, "tmp")) {
-        include 'custom.properties'
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += [ "build/metaProperties" ]
+        }
     }
 }
 
+processResources {
+    dependsOn 'metaProperties'
+}
+
 task metaProperties() {
-    def output = new File(project.buildDir, "tmp/custom.properties")
+    def output = new File(project.buildDir, "metaProperties/custom.properties")
     outputs.file(output)
     doLast {
         def props = new Properties()
