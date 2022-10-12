@@ -1,0 +1,51 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'com.example'
+version = '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    testImplementation 'junit:junit:4.13'
+    testRuntimeOnly 'ch.qos.logback:logback-classic:1.2.3'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    withJavadocJar()
+    withSourcesJar()
+}
+
+compileJava {
+    options.compilerArgs << '-parameters'
+}
+
+javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    dependsOn 'metaProperties'
+    from(new File(project.buildDir, "tmp")) {
+        include 'custom.properties'
+    }
+}
+
+task metaProperties() {
+    def output = new File(project.buildDir, "tmp/custom.properties")
+    outputs.file(output)
+    doLast {
+        def props = new Properties()
+        props.setProperty("lib.version", "${project.version}")
+        props.store(output.newOutputStream(), null)
+    }
+}
